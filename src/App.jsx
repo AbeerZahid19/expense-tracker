@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
 import ExpenseForm from './components/ExpenseForm';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import './App.css';
 
 function App() {
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [authView, setAuthView] = useState('login'); // 'login' or 'signup'
+
   const [expenses, setExpenses] = useState(() => {
     const saved = localStorage.getItem('expenses');
     return saved ? JSON.parse(saved) : [];
@@ -22,6 +31,16 @@ function App() {
   useEffect(() => {
     localStorage.setItem('budget', budget);
   }, [budget]);
+
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
 
   const handleAddExpense = (newExpense) => {
     setExpenses([...expenses, newExpense]);
@@ -51,9 +70,46 @@ function App() {
   const remaining = budgetNum - totalSpent;
   const isOverBudget = remaining < 0;
 
+  // Agar user login nahi hai, Login/Signup dikhao
+  if (!user) {
+    return (
+      <div className="app-container">
+        <h1 className="app-title">💰 Smart Expense Tracker</h1>
+        {authView === 'login' ? (
+          <Login
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchToSignup={() => setAuthView('signup')}
+          />
+        ) : (
+          <Signup onSwitchToLogin={() => setAuthView('login')} />
+        )}
+      </div>
+    );
+  }
+
+  // Agar user login hai, Expense Tracker dikhao
   return (
     <div className="app-container">
-      <h1 className="app-title">💰 Smart Expense Tracker</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1 className="app-title" style={{ marginBottom: 0 }}>💰 Smart Expense Tracker</h1>
+        <button
+          onClick={handleLogout}
+          style={{
+            background: '#e74c3c',
+            color: 'white',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
+      <p style={{ color: '#a0a0c0', marginBottom: '20px' }}>
+        Welcome, {user.name}!
+      </p>
 
       <div className="card">
         <div className="form-group">
