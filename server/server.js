@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const expenseRoutes = require('./routes/expenses');
+const budgetRoutes = require('./routes/budget');
 
 const app = express();
 
@@ -13,8 +15,10 @@ app.get('/', (req, res) => {
   res.send('Expense Tracker API is running');
 });
 
-// Auth routes
+// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/budget', budgetRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected successfully'))
