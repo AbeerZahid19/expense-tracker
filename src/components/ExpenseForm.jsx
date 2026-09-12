@@ -5,14 +5,15 @@ function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpense, onCancelEd
   const [category, setCategory] = useState('Food');
   const [date, setDate] = useState('');
   const [note, setNote] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
 
-  // Jab editingExpense set ho, form ko us data se bhar do
   useEffect(() => {
     if (editingExpense) {
       setAmount(editingExpense.amount);
       setCategory(editingExpense.category);
       setDate(editingExpense.date);
       setNote(editingExpense.note);
+      setIsRecurring(editingExpense.isRecurring || false);
     }
   }, [editingExpense]);
 
@@ -25,22 +26,21 @@ function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpense, onCancelEd
     }
 
     if (editingExpense) {
-      // Update existing expense
       onUpdateExpense({
         ...editingExpense,
         amount: parseFloat(amount),
         category,
         date,
         note,
+        isRecurring,
       });
     } else {
-      // Add new expense
       onAddExpense({
-        id: Date.now(),
         amount: parseFloat(amount),
         category,
         date,
         note,
+        isRecurring,
       });
     }
 
@@ -48,6 +48,7 @@ function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpense, onCancelEd
     setDate('');
     setNote('');
     setCategory('Food');
+    setIsRecurring(false);
   };
 
   return (
@@ -93,6 +94,19 @@ function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpense, onCancelEd
           onChange={(e) => setNote(e.target.value)}
           placeholder="optional"
         />
+      </div>
+
+      <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="checkbox"
+          id="recurring"
+          checked={isRecurring}
+          onChange={(e) => setIsRecurring(e.target.checked)}
+          style={{ width: 'auto' }}
+        />
+        <label htmlFor="recurring" style={{ margin: 0, cursor: 'pointer' }}>
+          Mark as recurring (e.g. rent, subscriptions)
+        </label>
       </div>
 
       <button type="submit" className="btn">

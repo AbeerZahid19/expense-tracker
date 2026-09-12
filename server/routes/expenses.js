@@ -17,7 +17,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // POST - naya expense add karo
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { amount, category, date, note } = req.body;
+    const { amount, category, date, note, isRecurring } = req.body;
 
     const newExpense = new Expense({
       userId: req.userId,
@@ -25,6 +25,7 @@ router.post('/', authMiddleware, async (req, res) => {
       category,
       date,
       note,
+      isRecurring: isRecurring || false,
     });
 
     await newExpense.save();
@@ -37,7 +38,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // PUT - expense update karo
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const { amount, category, date, note } = req.body;
+    const { amount, category, date, note, isRecurring } = req.body;
 
     const expense = await Expense.findOne({ _id: req.params.id, userId: req.userId });
     if (!expense) {
@@ -48,6 +49,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     expense.category = category;
     expense.date = date;
     expense.note = note;
+    expense.isRecurring = isRecurring || false;
 
     await expense.save();
     res.json(expense);

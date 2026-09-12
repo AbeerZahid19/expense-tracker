@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import ExpenseForm from './components/ExpenseForm';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import CategoryBudgets from './components/CategoryBudgets';
+import Toast from './components/Toast';
 import './App.css';
 
 const API_URL = 'http://localhost:5000/api';
@@ -22,6 +23,10 @@ function App() {
   });
   const [editingExpense, setEditingExpense] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  const wasOverBudget = useRef(false);
+  const wasNearBudget = useRef(false);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -58,6 +63,11 @@ function App() {
     localStorage.removeItem('user');
     setUser(null);
     setExpenses([]);
+  };
+
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: '' }), 4000);
   };
 
   const handleAddExpense = async (newExpense) => {
@@ -103,10 +113,56 @@ function App() {
     setEditingExpense(null);
   };
 
+  const handleAddRecurringAgain = async (recurringExpense) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await axios.post(
+        `${API_URL}/expenses`,
+        {
+          amount: recurringExpense.amount,
+          category: recurringExpense.category,
+          date: today,
+          note: recurringExpense.note,
+          isRecurring: true,
+        },
+        getAuthHeaders()
+      );
+      setExpenses([response.data, ...expenses]);
+      showToast('Recurring expense added for this month!', 'warning');
+    } catch (error) {
+      console.error('Error adding recurring expense:', error);
+      alert('Failed to add recurring expense');
+    }
+  };
+
   const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const budgetNum = parseFloat(budget) || 0;
   const remaining = budgetNum - totalSpent;
   const isOverBudget = remaining < 0;
+  const isNearBudget = totalSpent >= budgetNum * 0.8 && budgetNum > 0;
+
+  // Toast trigger karo jab threshold cross ho (sirf ek dafa, dobara render par nahi)
+  useEffect(() => {
+    if (isOverBudget && !wasOverBudget.current) {
+      showToast(`⚠️ You've exceeded your monthly budget by Rs. ${Math.abs(remaining)}!`, 'danger');
+    } else if (isNearBudget && !isOverBudget && !wasNearBudget.current) {
+      showToast(`⚡ Heads up! You've used ${Math.round((totalSpent / budgetNum) * 100)}% of your budget.`, 'warning');
+    }
+    wasOverBudget.current = isOverBudget;
+    wasNearBudget.current = isNearBudget;
+  }, [isOverBudget, isNearBudget]);
+
+  const recurringTemplates = [];
+  const seen = new Set();
+  expenses
+    .filter((exp) => exp.isRecurring)
+    .forEach((exp) => {
+      const key = `${exp.category}-${exp.amount}-${exp.note}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        recurringTemplates.push(exp);
+      }
+    });
 
   if (!user) {
     return (
@@ -126,6 +182,12 @@ function App() {
 
   return (
     <div className="app-container">
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: '', type: '' })}
+      />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1 className="app-title" style={{ marginBottom: 0 }}>💰 Smart Expense Tracker</h1>
         <button
@@ -168,7 +230,7 @@ function App() {
         />
       </div>
 
-      <div className={`budget-card ${isOverBudget ? 'danger' : 'safe'}`}>
+      <div className={`budget-card ${isOverBudget ? 'danger' : isNearBudget ? 'warning' : 'safe'}`}>
         <div className="budget-row">
           <span>Total Spent</span>
           <span>Rs. {totalSpent}</span>
@@ -180,11 +242,43 @@ function App() {
         <div className="budget-remaining">
           {isOverBudget
             ? `⚠️ Over Budget by Rs. ${Math.abs(remaining)}`
+            : isNearBudget
+            ? `⚡ Caution: ${Math.round((totalSpent / budgetNum) * 100)}% of budget used`
             : `✅ Remaining: Rs. ${remaining}`}
         </div>
       </div>
 
       <CategoryBudgets expenses={expenses} />
+
+      {recurringTemplates.length > 0 && (
+        <div className="card">
+          <h2>🔁 Recurring Expenses</h2>
+          {recurringTemplates.map((item) => (
+            <div
+              key={item._id}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '10px 0',
+                borderBottom: '1px solid #444460',
+              }}
+            >
+              <div>
+                <strong>Rs. {item.amount}</strong> — {item.category}
+                {item.note && <div style={{ fontSize: '0.8rem', color: '#7a7a9a' }}>{item.note}</div>}
+              </div>
+              <button
+                className="btn"
+                style={{ width: 'auto', padding: '6px 14px', fontSize: '0.85rem' }}
+                onClick={() => handleAddRecurringAgain(item)}
+              >
+                Add this month
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <h3 style={{ marginBottom: '12px', color: '#b0b0d0' }}>Expenses</h3>
       {loading ? (
@@ -196,7 +290,9 @@ function App() {
           {expenses.map((expense) => (
             <li key={expense._id} className="expense-item">
               <div>
-                <div className="expense-amount">Rs. {expense.amount}</div>
+                <div className="expense-amount">
+                  Rs. {expense.amount} {expense.isRecurring && '🔁'}
+                </div>
                 <div className="expense-category">{expense.category}</div>
                 <div className="expense-meta">
                   {expense.date} {expense.note && `• ${expense.note}`}
@@ -226,5 +322,3 @@ function App() {
 }
 
 export default App;
-
- 
