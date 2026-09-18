@@ -194,3 +194,51 @@ body {
     opacity: 1;
   }
 }
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 20px 12px;
+  }
+
+  .app-title {
+    font-size: 1.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .budget-remaining {
+    font-size: 1.1rem;
+  }
+
+  .expense-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .expense-item > div:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-title {
+    font-size: 1.3rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+  }
+}

@@ -5,6 +5,8 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import CategoryBudgets from './components/CategoryBudgets';
 import Toast from './components/Toast';
+import CategoryPieChart from './components/CategoryPieChart';
+import MonthlyBarChart from './components/MonthlyBarChart';
 import './App.css';
 
 const API_URL = 'http://localhost:5000/api';
@@ -141,7 +143,6 @@ function App() {
   const isOverBudget = remaining < 0;
   const isNearBudget = totalSpent >= budgetNum * 0.8 && budgetNum > 0;
 
-  // Toast trigger karo jab threshold cross ho (sirf ek dafa, dobara render par nahi)
   useEffect(() => {
     if (isOverBudget && !wasOverBudget.current) {
       showToast(`⚠️ You've exceeded your monthly budget by Rs. ${Math.abs(remaining)}!`, 'danger');
@@ -249,6 +250,9 @@ function App() {
       </div>
 
       <CategoryBudgets expenses={expenses} />
+
+      <CategoryPieChart expenses={expenses} />
+      <MonthlyBarChart expenses={expenses} />
 
       {recurringTemplates.length > 0 && (
         <div className="card">
