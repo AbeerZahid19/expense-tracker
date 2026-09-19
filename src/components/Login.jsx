@@ -11,7 +11,7 @@ function Login({ onLoginSuccess, onSwitchToSignup }) {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://expense-tracker-api-woad.vercel.app/api/auth/login', {
         email,
         password,
       });

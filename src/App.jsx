@@ -9,7 +9,7 @@ import CategoryPieChart from './components/CategoryPieChart';
 import MonthlyBarChart from './components/MonthlyBarChart';
 import './App.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://expense-tracker-api-woad.vercel.app/api';
 
 function App() {
   const [user, setUser] = useState(() => {

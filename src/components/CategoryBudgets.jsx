@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://expense-tracker-api-woad.vercel.app/api';
 const CATEGORIES = ['Food', 'Rent', 'Transport', 'Utilities', 'Entertainment', 'Other'];
 
 function CategoryBudgets({ expenses }) {
