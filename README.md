@@ -1,16 +1,74 @@
-# React + Vite
+# 💰 Smart Expense Tracker with Budget Alerts
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack MERN expense tracking web application that helps users manage their personal finances with category-wise budget limits, real-time alerts, recurring expenses, and visual spending insights.
 
-Currently, two official plugins are available:
+## 🔗 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend:** https://expense-tracker-wine-nine-32.vercel.app/
+- **Backend API:** https://expense-tracker-api-woad.vercel.app/
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **User Authentication** — Secure signup/login with JWT tokens and bcrypt password hashing
+- **Expense Management** — Add, edit, and delete expenses with category, date, and notes
+- **Monthly Budget Tracking** — Set an overall monthly budget with real-time remaining balance
+- **Category-wise Budget Limits** — Set individual budget limits per category (Food, Rent, Transport, etc.) with progress bars
+- **Smart Alerts** — Get warned at 80% budget usage and when budget is exceeded, via inline banners and toast notifications
+- **Recurring Expenses** — Mark expenses as recurring (rent, subscriptions) and re-add them for the current month with one click
+- **Data Visualization** — Pie chart for category-wise spending split, bar chart for monthly spending trends
+- **Responsive Design** — Works smoothly on mobile, tablet, and desktop
+- **Persistent Data** — All data stored securely in MongoDB, tied to individual user accounts
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Frontend:**
+- React (Vite)
+- Axios
+- Recharts (data visualization)
+- Custom CSS (dark theme, responsive)
+
+**Backend:**
+- Node.js + Express
+- MongoDB Atlas + Mongoose
+- JWT (authentication)
+- bcryptjs (password hashing)
+
+**Deployment:**
+- Frontend & Backend both deployed on Vercel
+
+## 📁 Project Structure
+expense-tracker/
+├── src/ # React frontend
+│ ├── components/ # ExpenseForm, Login, Signup, Charts, etc.
+│ ├── App.jsx
+│ └── App.css
+├── server/ # Node/Express backend
+│ ├── models/ # User, Expense, Budget schemas
+│ ├── routes/ # auth, expenses, budget routes
+│ ├── middleware/ # JWT auth middleware
+│ └── server.js
+└── README.md
+## 🚀 Running Locally
+
+**Backend:**
+```bash
+cd server
+npm install
+node server.js
+```
+
+**Frontend:**
+```bash
+npm install
+npm run dev
+```
+
+Create a `.env` file inside `/server` with:
+
+MONGO_URI=your_mongodb_connection
+JWT_SECRET=your_secret_key
+PORT=5000
+
+## 👩‍💻 Author
+
+Built by Abeer Zahid as part of a self-paced internship project.
